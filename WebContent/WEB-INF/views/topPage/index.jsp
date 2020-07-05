@@ -9,6 +9,13 @@
             </div>
         </c:if>
         <h2>日報管理システムへようこそ</h2>
+        <form class="attendance" method="POST" action="<c:url value='/attendance/in' />">
+            <button>出勤</button>
+        </form>
+        <form class="attendance" method="POST" action="<c:url value='/attendance/out' />">
+            <button>退勤</button>
+        </form>
+        <br/> <br/>
         <h3>【自分の日報　一覧】</h3>
         <table id="report_list">
             <tbody>
@@ -42,6 +49,6 @@
                 </c:choose>
             </c:forEach>
         </div>
-        <p><a href="<c:url value='/reports/new' />">新規日報の登録</a></p>
+        <p><a href="<c:url value='/reports/new' />">新規日報の登録</a></p><br/>
     </c:param>
 </c:import>

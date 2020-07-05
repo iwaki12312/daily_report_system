@@ -162,3 +162,14 @@ pre {
 h3 {
     font-size: larger;
 }
+
+.attendance{
+    display: inline-block;
+    margin-right: 50px;
+}
+
+.attendance button{
+    font-size: 20px;
+    padding: 5px 15px;
+    background-color: #DDDDDD;
+

@@ -24,6 +24,33 @@
                             </td>
                         </tr>
                         <tr>
+                            <th>出勤時刻</th>
+                            <td>
+                            <c:choose>
+                                <c:when test="${attendance.inTime == null}">
+                                    <pre>出勤時刻は登録されていません</pre>
+                                </c:when>
+                                <c:otherwise>
+                                    <fmt:formatDate value="${attendance.inTime}" pattern="yyyy-MM-dd HH:mm:ss" />
+                                </c:otherwise>
+                            </c:choose>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>退勤時刻</th>
+                            <td>
+                            <c:choose>
+                                <c:when test="${attendance.outTime == null}">
+                                    <pre>退勤時刻は登録されていません</pre>
+                                </c:when>
+                                <c:otherwise>
+                                    <fmt:formatDate value="${attendance.outTime}" pattern="yyyy-MM-dd HH:mm:ss" />
+                                </c:otherwise>
+                            </c:choose>
+                            </td>
+                        </tr>
+                        <tr>
                             <th>登録日時</th>
                             <td>
                                 <fmt:formatDate value="${report.created_at}" pattern="yyyy-MM-dd HH:mm:ss" />

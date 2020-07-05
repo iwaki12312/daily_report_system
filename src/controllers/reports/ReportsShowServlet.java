@@ -1,6 +1,8 @@
 package controllers.reports;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.persistence.EntityManager;
 import javax.servlet.RequestDispatcher;
@@ -10,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import models.Attendance;
 import models.Report;
 import utils.DBUtil;
 
@@ -34,11 +37,24 @@ public class ReportsShowServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         EntityManager em = DBUtil.createEntityManager();
 
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
         Report r = em.find(Report.class, Integer.parseInt(request.getParameter("id")));
+
+        Attendance a = null;
+        try{a = em.createNamedQuery("getTimes", Attendance.class)
+                                            .setParameter("employee", r.getEmployee())
+                                            .setParameter("date", dateFormat.format(date))
+                                            .getSingleResult();
+        }catch (Exception e) {
+           e.printStackTrace();
+        }
 
         em.close();
 
         request.setAttribute("report", r);
+        request.setAttribute("attendance", a);
         request.setAttribute("_token", request.getSession().getId());
 
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/reports/show.jsp");
