@@ -166,10 +166,41 @@ h3 {
 .attendance{
     display: inline-block;
     margin-right: 50px;
+    margin-bottom: 10px;
 }
 
 .attendance button{
     font-size: 20px;
     padding: 5px 15px;
     background-color: #DDDDDD;
+}
+
+.follow{
+    display: inline-block;
+    margin-left: 50px;
+    margin-top: 20px;
+
+}
+
+.follow button{
+    font-size: 20px;
+    padding: 5px 15px;
+    background-color: #DDDDDD;
+
+}
+
+.search h2{
+    display: inline-block;
+}
+
+.search form{
+    display: inline-block;
+}
+
+
+.search p{
+    display: inline-block;
+    padding-left: 20px;
+}
+
 

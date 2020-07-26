@@ -73,13 +73,16 @@ public class LoginServlet extends HttpServlet {
                       .setParameter("code", code)
                       .setParameter("pass", password)
                       .getSingleResult();
+
             } catch(NoResultException ex) {}
 
-            em.close();
 
             if(e != null) {
                 check_result = true;
             }
+
+
+            em.close();
         }
 
         if(!check_result) {
@@ -93,7 +96,6 @@ public class LoginServlet extends HttpServlet {
         } else {
             // 認証できたらログイン状態にしてトップページへリダイレクト
             request.getSession().setAttribute("login_employee", e);
-
             request.getSession().setAttribute("flush", "ログインしました。");
             response.sendRedirect(request.getContextPath() + "/");
         }

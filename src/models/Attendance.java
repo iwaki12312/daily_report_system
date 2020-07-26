@@ -17,8 +17,13 @@ import javax.persistence.Table;
     @NamedQuery(
             name = "getTimes",
             query = "SELECT a FROM Attendance AS a WHERE a.employee  = :employee AND a.date = :date"
+            ),
+    @NamedQuery(
+            name = "getAttendanceRecords",
+            query = "SELECT a FROM Attendance AS a WHERE a.employee  = :employee AND a.date LIKE :date ORDER BY a.date DESC"
             )
 })
+
 @Entity
 public class Attendance{
 

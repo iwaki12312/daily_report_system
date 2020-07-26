@@ -68,12 +68,26 @@
                 <c:if test="${sessionScope.login_employee.id == report.employee.id}">
                     <p><a href="<c:url value="/reports/edit?id=${report.id}" />">この日報を編集する</a></p>
                 </c:if>
+
             </c:when>
             <c:otherwise>
                 <h2>お探しのデータは見つかりませんでした。</h2>
             </c:otherwise>
         </c:choose>
 
-        <p><a href="<c:url value="/reports/index" />">一覧に戻る</a></p>
+        <span><a href="<c:url value="/reports/index" />">一覧に戻る</a></span>
+
+        <c:choose>
+          <c:when test="${followDeta == 0}">
+             <form class="follow" method="POST" action="<c:url value='/follow?reportId=${report.id}' />">
+                <button>この社員をフォローする</button>
+             </form>
+          </c:when>
+          <c:when test="${followDeta == 1}">
+            <form class="follow" method="POST" action="<c:url value='/follow/remove?reportId=${report.id}' />">
+                <button>フォローを解除する</button>
+             </form>
+          </c:when>
+        </c:choose>
     </c:param>
 </c:import>

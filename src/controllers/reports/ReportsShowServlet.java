@@ -2,7 +2,6 @@ package controllers.reports;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.persistence.EntityManager;
 import javax.servlet.RequestDispatcher;
@@ -13,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import models.Attendance;
+import models.Employee;
+import models.Follow;
 import models.Report;
 import utils.DBUtil;
 
@@ -37,22 +38,48 @@ public class ReportsShowServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         EntityManager em = DBUtil.createEntityManager();
 
-        Date date = new Date();
+        Report r = em.find(Report.class, Integer.parseInt(request.getParameter("id")));
+        Employee employee = r.getEmployee();
+        Employee login_employee = (Employee)request.getSession().getAttribute("login_employee");
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        Report r = em.find(Report.class, Integer.parseInt(request.getParameter("id")));
+
 
         Attendance a = null;
         try{a = em.createNamedQuery("getTimes", Attendance.class)
                                             .setParameter("employee", r.getEmployee())
-                                            .setParameter("date", dateFormat.format(date))
+                                            .setParameter("date", dateFormat.format(r.getReport_date()))
                                             .getSingleResult();
         }catch (Exception e) {
            e.printStackTrace();
         }
 
+        Follow b = null;
+
+        try{
+            b = em.createNamedQuery("getFollows", Follow.class)
+            .setParameter("employee_id", login_employee.getId())
+            .setParameter("follow", employee.getId())
+            .getSingleResult();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
         em.close();
 
+        int followCheck_1 = employee.getId();
+        int followCheck_2 = login_employee.getId();
+
+        if(followCheck_1 == followCheck_2){
+            request.setAttribute("followDeta", 2);
+        }else if(b == null){
+            request.setAttribute("followDeta", 0);
+        }else if(b != null){
+            request.setAttribute("followDeta", 1);
+        }
+
+        request.setAttribute("employee", employee);
         request.setAttribute("report", r);
         request.setAttribute("attendance", a);
         request.setAttribute("_token", request.getSession().getId());

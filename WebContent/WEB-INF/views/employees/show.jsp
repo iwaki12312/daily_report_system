@@ -41,7 +41,8 @@
                     </tbody>
                 </table>
 
-                <p><a href="<c:url value='/employees/edit?id=${employee.id}' />">この従業員情報を編集する</a></p>
+                <p><a href="<c:url value='/attendance/record?id=${employee.id}&month=${month}&year=${year}' />">この従業員の出勤情報を見る</a></p>
+                <span><a href="<c:url value='/employees/edit?id=${employee.id}' />">この従業員情報を編集する</a></span>
             </c:when>
             <c:otherwise>
                 <h2>お探しのデータは見つかりませんでした。</h2>

@@ -1,6 +1,8 @@
 package controllers.toppage;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -11,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import models.Attendance;
 import models.Employee;
 import models.Report;
 import utils.DBUtil;
@@ -37,6 +40,29 @@ public class TopPageIndexServlet extends HttpServlet {
         EntityManager em = DBUtil.createEntityManager();
 
         Employee login_employee = (Employee)request.getSession().getAttribute("login_employee");
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
+        SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MM");
+        Attendance b = null;
+
+        try{b = em.createNamedQuery("getTimes", Attendance.class)
+                .setParameter("employee", login_employee)
+                .setParameter("date", dateFormat.format(date))
+                .getSingleResult();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if(b == null || (b.getInTime() == null && b.getOutTime() == null)){
+            request.setAttribute("attendance", 0);
+        }else if(b.getInTime() != null && b.getOutTime() == null){
+            request.setAttribute("attendance", 1);
+        }else if(b.getInTime() != null && b.getOutTime() != null){
+            request.setAttribute("attendance", 2);
+        }
+
+
 
         int page;
         try{
@@ -59,6 +85,9 @@ public class TopPageIndexServlet extends HttpServlet {
         request.setAttribute("reports", reports);
         request.setAttribute("reports_count", reports_count);
         request.setAttribute("page", page);
+        request.setAttribute("employee", login_employee);
+        request.setAttribute("year", dateFormatYear.format(date));
+        request.setAttribute("month", dateFormatMonth.format(date));
 
         if(request.getSession().getAttribute("flush") != null) {
             request.setAttribute("flush", request.getSession().getAttribute("flush"));

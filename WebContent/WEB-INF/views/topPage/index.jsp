@@ -9,12 +9,37 @@
             </div>
         </c:if>
         <h2>日報管理システムへようこそ</h2>
-        <form class="attendance" method="POST" action="<c:url value='/attendance/in' />">
-            <button>出勤</button>
-        </form>
-        <form class="attendance" method="POST" action="<c:url value='/attendance/out' />">
-            <button>退勤</button>
-        </form>
+        <c:choose>
+            <c:when test="${attendance == 0}">
+                <form class="attendance" method="POST" action="<c:url value='/attendance/in' />">
+                    <button>出勤</button>
+                </form>
+            </c:when>
+            <c:when test="${attendance == 1}">
+                <form class="attendance" method="POST" action="<c:url value='/attendance/out' />">
+                    <button>退勤</button>
+                </form>
+                <form method="post" name = "form1" action="<c:url value='/attendance/in' />">
+                    <a href="<c:url value='/attendance/in' />" onclick="document.form1.submit();return false;">出勤を取り消す</a>
+                </form>
+            </c:when>
+            <c:when test="${attendance == 2}">
+                <form method="post" name = "form1" action="<c:url value='/attendance/out' />">
+                    <a href="<c:url value='/attendance/out' />" onclick="document.form1.submit();return false;">退勤を取り消す</a>
+                </form>
+            </c:when>
+        </c:choose>
+        <p><a href="<c:url value='/attendance/record?id=${employee.id}&month=${month}&year=${year}' />">自分の出勤情報を見る</a></p>
+<!--
+         <form class="attendance" method="POST" action="<c:url value='/testattendance' />">
+                    <button>出勤退勤テストデータ挿入</button>
+                </form>
+-->
+<!--
+         <form class="attendance" method="POST" action="<c:url value='/testdeta' />">
+                    <button>従業員テストデータ挿入</button>
+                </form>
+-->
         <br/> <br/>
         <h3>【自分の日報　一覧】</h3>
         <table id="report_list">

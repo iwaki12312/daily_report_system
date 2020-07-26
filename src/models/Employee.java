@@ -18,6 +18,14 @@ import javax.persistence.Table;
             query = "SELECT e FROM Employee AS e ORDER BY e.id DESC"
             ),
     @NamedQuery(
+            name = "getFollowEmployeesIndex",
+            query = "SELECT e FROM Employee AS e WHERE e.delete_flag <> 1 AND e.id <> :employee_id AND  e.name LIKE :name ORDER BY e.id DESC"
+            ),
+    @NamedQuery(
+            name = "getFollowEmployeesCount",
+            query = "SELECT COUNT(e) FROM Employee AS e WHERE e.delete_flag <> 1 AND e.id <> :employee_id"
+            ),
+    @NamedQuery(
             name = "getEmployeesCount",
             query = "SELECT COUNT(e) FROM Employee AS e"
             ),

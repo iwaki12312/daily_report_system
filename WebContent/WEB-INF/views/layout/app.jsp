@@ -18,6 +18,9 @@
                             <a href="<c:url value='/employees/index' />">従業員管理</a>&nbsp;
                         </c:if>
                         <a href="<c:url value='/reports/index' />">日報管理</a>&nbsp;
+                        <a href="<c:url value='/follow/index' />">従業員をフォローする</a>&nbsp;
+                        <a href="<c:url value='/follow/followemployee' />">フォロー&nbsp;<c:out value="${followCount}"/>&nbsp;人</a>&nbsp;
+                        <a href="<c:url value='/follow/followeremployee' />">フォロワー&nbsp;<c:out value="${followerCount}"/>&nbsp;人</a>&nbsp;
                     </c:if>
                 </div>
                 <c:if test="${sessionScope.login_employee != null}">
@@ -31,7 +34,7 @@
                 ${param.content}
             </div>
             <div id="footer">
-                by Taro Kirameki.
+                by Iwaki Matsumoto.
             </div>
         </div>
     </body>

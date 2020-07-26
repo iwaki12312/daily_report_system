@@ -1,6 +1,8 @@
 package controllers.employees;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.persistence.EntityManager;
 import javax.servlet.RequestDispatcher;
@@ -34,11 +36,18 @@ public class EmployeesShowServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         EntityManager em = DBUtil.createEntityManager();
 
-        Employee e = em.find(Employee.class, Integer.parseInt(request.getParameter("id")));
+        Employee employee = em.find(Employee.class, Integer.parseInt(request.getParameter("id")));
+
+        Date date = new Date();
+        SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
+        SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MM");
+
 
         em.close();
 
-        request.setAttribute("employee", e);
+        request.setAttribute("employee", employee);
+        request.setAttribute("year", dateFormatYear.format(date));
+        request.setAttribute("month", dateFormatMonth.format(date));
 
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/employees/show.jsp");
         rd.forward(request, response);

@@ -42,6 +42,7 @@ public class AttendanceOut extends HttpServlet {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Attendance b = null;
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 
         try{b = em.createNamedQuery("getTimes", Attendance.class)
                                             .setParameter("employee", login_employee)
@@ -58,7 +59,7 @@ public class AttendanceOut extends HttpServlet {
 
             a.setDate(dateFormat.format(date));
 
-            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+
             a.setOutTime(currentTime);
             a.setCreated_at(currentTime);
             a.setUpdated_at(currentTime);
@@ -74,7 +75,6 @@ public class AttendanceOut extends HttpServlet {
 
         }else if(b.getOutTime() == null){
 
-            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             b.setOutTime(currentTime);
             b.setUpdated_at(currentTime);
 
@@ -86,7 +86,15 @@ public class AttendanceOut extends HttpServlet {
             request.getSession().setAttribute("flush", "退勤時刻を登録しました。");
             response.sendRedirect(request.getContextPath() + "/login");
         }else{
-            request.getSession().setAttribute("flush", "本日の退勤時刻は既に登録されています");
+
+            b.setOutTime(null);
+            b.setUpdated_at(currentTime);
+
+            em.getTransaction().begin();
+            em.persist(b);
+            em.getTransaction().commit();
+            em.close();
+            request.getSession().setAttribute("flush", "退勤時刻を削除しました。");
             response.sendRedirect(request.getContextPath() + "/login");
         }
     }

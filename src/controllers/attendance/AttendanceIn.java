@@ -85,7 +85,17 @@ public class AttendanceIn extends HttpServlet {
             request.getSession().setAttribute("flush", "出勤時刻を登録しました。");
             response.sendRedirect(request.getContextPath() + "/login");
         }else{
-            request.getSession().setAttribute("flush", "本日の出勤時刻は既に登録されています");
+
+            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+            b.setInTime(null);
+            b.setUpdated_at(currentTime);
+
+            em.getTransaction().begin();
+            em.persist(b);
+            em.getTransaction().commit();
+            em.close();
+
+            request.getSession().setAttribute("flush", "出勤時刻を削除しました。");
             response.sendRedirect(request.getContextPath() + "/login");
         }
     }
