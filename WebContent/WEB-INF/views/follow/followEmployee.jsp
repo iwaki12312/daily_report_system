@@ -18,7 +18,7 @@
                         <td><c:out value="${employee.code}" /></td>
                         <td><c:out value="${employee.name}" /></td>
                         <td>
-                            <c:if test="${login_employee.admin_flag == 1 }">
+                            <c:if test="${login_employee.position_flag == 1 }">
                                 <a href="<c:url value='/employees/show?id=${employee.id}' />">社員情報を見る</a><br>
                             </c:if>
                             <a href="<c:url value='/follow/reportindex?id=${employee.id}' />">この従業員の日報一覧を見る</a>

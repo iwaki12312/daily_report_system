@@ -20,7 +20,7 @@ import javax.persistence.Table;
             ),
     @NamedQuery(
             name = "getAttendanceRecords",
-            query = "SELECT a FROM Attendance AS a WHERE a.employee  = :employee AND a.date LIKE :date ORDER BY a.date DESC"
+            query = "SELECT a FROM Attendance AS a WHERE a.employee  = :employee AND a.date LIKE :date AND a.inTime <> null ORDER BY a.date DESC"
             )
 })
 

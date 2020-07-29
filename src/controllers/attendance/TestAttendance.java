@@ -38,19 +38,24 @@ public class TestAttendance extends HttpServlet {
         EntityManager em = DBUtil.createEntityManager();
         Employee login_employee = (Employee)request.getSession().getAttribute("login_employee");
         Date date = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
 
         em.getTransaction().begin();
 
-        String in = "2020-07-10 09:00:00.000000000";
+        String setDate = "2020-08-06 09:00:00.000000000";
+        Timestamp setNowData = Timestamp.valueOf(setDate);
+
+        String in = "2020-08-06 09:00:00.000000000";
         Timestamp inData = Timestamp.valueOf(in);
 
-        String out = "2020-07-10 18:00:00.000000000";
+        String out = "2020-08-06 18:00:00.000000000";
         Timestamp outData = Timestamp.valueOf(out);
+
+        Calendar setCalendar = Calendar.getInstance();
+        setCalendar.setTime(setNowData);
 
         Calendar inCalendar = Calendar.getInstance();
         inCalendar.setTime(inData);
@@ -64,12 +69,12 @@ public class TestAttendance extends HttpServlet {
         for(int i = 0; i < 1000; i++){
 
         Attendance a = new Attendance();
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        setCalendar.add(Calendar.DAY_OF_MONTH, -1);
         inCalendar.add(Calendar.DAY_OF_MONTH, -1);
         outCalendar.add(Calendar.DAY_OF_MONTH, -1);
 
 
-        date = calendar.getTime();
+        date = setCalendar.getTime();
 
         String str1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(inCalendar.getTime());
         Timestamp inTime = Timestamp.valueOf(str1);

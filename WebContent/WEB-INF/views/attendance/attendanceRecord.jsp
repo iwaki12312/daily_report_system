@@ -16,7 +16,6 @@
                 </tr>
                 <c:forEach var="record" items="${records}" varStatus="status">
                     <tr class="row${status.count % 2}">
-                        <c:if test="${record.inTime != null}">
                             <td><c:out value="${record.date}" /></td>
                             <td><fmt:formatDate value="${record.inTime}" pattern="HH:mm:ss" /></td>
                                  <c:if test="${record.outTime != null}">
@@ -25,7 +24,6 @@
                                  <c:if test="${record.outTime == null}">
                             <td>データが存在しません</td>
                             </c:if>
-                        </c:if>
                     </tr>
                 </c:forEach>
             </tbody>

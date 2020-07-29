@@ -20,10 +20,10 @@
                         <tr>
                             <th>権限</th>
                             <td>
-                                <c:choose>
-                                    <c:when test="${employee.admin_flag == 1}">管理者</c:when>
-                                    <c:otherwise>一般</c:otherwise>
-                                </c:choose>
+                                    <c:if test="${employee.position_flag == 0}">一般</c:if>
+                                    <c:if test="${employee.position_flag == 1}">管理者</c:if>
+                                    <c:if test="${employee.position_flag == 2}">課長</c:if>
+                                    <c:if test="${employee.position_flag == 3}">部長</c:if>
                             </td>
                         </tr>
                         <tr>

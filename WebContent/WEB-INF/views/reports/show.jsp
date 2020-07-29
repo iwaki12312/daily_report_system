@@ -51,6 +51,33 @@
                             </td>
                         </tr>
                         <tr>
+                            <th>課長承認</th>
+                            <td>
+                            <c:choose>
+                                <c:when test="${report.section_manager_approval != null}">
+                                   <pre><c:out value="${report.section_manager_approval.name}" /></pre>
+                                </c:when>
+                                <c:otherwise>
+                                   <pre>未承認</pre>
+                                </c:otherwise>
+                            </c:choose>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>部長承認</th>
+                            <td>
+                            <c:choose>
+                                <c:when test="${report.manager_approval != null}">
+                                   <pre><c:out value="${report.manager_approval.name}" /></pre>
+                                </c:when>
+                                <c:otherwise>
+                                   <pre>未承認</pre>
+                                </c:otherwise>
+                            </c:choose>
+
+                            </td>
+                        </tr>
+                        <tr>
                             <th>登録日時</th>
                             <td>
                                 <fmt:formatDate value="${report.created_at}" pattern="yyyy-MM-dd HH:mm:ss" />
@@ -89,5 +116,17 @@
              </form>
           </c:when>
         </c:choose>
+        <c:if test="${login_employee.id != employee.id}">
+            <c:if test="${login_employee.position_flag == 2 && report.section_manager_approval == null}">
+                <form class="follow" method="POST" action="<c:url value='/approval?reportId=${report.id}' />">
+                      <button>課長承認する</button>
+                </form>
+            </c:if>
+            <c:if test="${login_employee.position_flag == 3 && report.section_manager_approval != null && report.manager_approval == null}">
+                <form class="follow" method="POST" action="<c:url value='/approval?reportId=${report.id}' />">
+                      <button>部長承認する</button>
+                </form>
+            </c:if>
+        </c:if>
     </c:param>
 </c:import>

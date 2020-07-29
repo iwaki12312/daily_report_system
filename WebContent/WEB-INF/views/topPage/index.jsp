@@ -8,7 +8,16 @@
                 <c:out value="${flush}"></c:out>
             </div>
         </c:if>
-        <h2>日報管理システムへようこそ</h2>
+        <h2 class = "top">日報管理システムへようこそ</h2>
+        <c:if test="${employee.position_flag == 2 && sectionManagerCount > 0}">
+           <span class = "approval">！課長承認待ちのレポートがあります</span>
+           <button onclick="location.href='approval/reports?position=${employee.position_flag}'">確認する</button>
+        </c:if>
+        <c:if test="${employee.position_flag == 3 && managerCount > 0}">
+           <span class = "approval">！部長承認待ちのレポートがあります</span>
+           <button onclick="location.href='approval/reports?position=${employee.position_flag}'">確認する</button>
+        </c:if>
+        <br>
         <c:choose>
             <c:when test="${attendance == 0}">
                 <form class="attendance" method="POST" action="<c:url value='/attendance/in' />">

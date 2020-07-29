@@ -80,9 +80,24 @@ public class TopPageIndexServlet extends HttpServlet {
                                      .setParameter("employee", login_employee)
                                      .getSingleResult();
 
+        // 課長未承認のレポート取得
+        List<Report> notSectionManagerApprovalreports = em.createNamedQuery("getNotSectionManagerApprovalReports", Report.class)
+                .setParameter("login_employee", login_employee)
+                .getResultList();
+        int sectionManagerCount = notSectionManagerApprovalreports.size();
+
+        // 部長未承認のレポート取得
+        List<Report> notManagerApprovalreports = em.createNamedQuery("getNotManagerApprovalReports", Report.class)
+                .setParameter("login_employee", login_employee)
+                .getResultList();
+        int managerCount = notManagerApprovalreports.size();
+
+
         em.close();
 
         request.setAttribute("reports", reports);
+        request.setAttribute("sectionManagerCount", sectionManagerCount);
+        request.setAttribute("managerCount", managerCount);
         request.setAttribute("reports_count", reports_count);
         request.setAttribute("page", page);
         request.setAttribute("employee", login_employee);

@@ -203,4 +203,11 @@ h3 {
     padding-left: 20px;
 }
 
+.top{
+    display: inline-block;
+}
 
+.approval{
+    padding-left: 50px;
+    color: #ff0000;
+}

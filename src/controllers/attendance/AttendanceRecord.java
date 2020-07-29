@@ -35,7 +35,7 @@ public class AttendanceRecord extends HttpServlet {
         Employee login_employee = (Employee)request.getSession().getAttribute("login_employee");
         String context_path = ((HttpServletRequest)request).getContextPath();
 
-        if(login_employee.getAdmin_flag() == 1 || (login_employee.getId() == employee.getId())){
+        if(login_employee.getPosition_flag() == 1 || (login_employee.getId() == employee.getId())){
 
         Date currentDate = new Date();
         SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");

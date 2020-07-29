@@ -51,6 +51,10 @@ public class ReportsIndexServlet extends HttpServlet {
 
         em.close();
 
+        // レポート承認時リダイレクト用フラグ
+        request.getSession().setAttribute("approvalRedirectFlag" , "reportIndex");
+
+
         request.setAttribute("reports", reports);
         request.setAttribute("reports_count", reports_count);
         request.setAttribute("page", page);

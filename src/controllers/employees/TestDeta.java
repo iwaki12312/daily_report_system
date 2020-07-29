@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import models.Employee;
 import utils.DBUtil;
+import utils.EncryptUtil;
 
 /**
  * Servlet implementation class TestDeta
@@ -64,8 +65,10 @@ public class TestDeta extends HttpServlet {
 
              e.setName(data[0]);
              e.setCode(data[1]);
-             e.setPassword(data[2]);
-             e.setAdmin_flag(Integer.parseInt(data[3]));
+             e.setPassword(EncryptUtil.getPasswordEncrypt(data[2],(String)this.getServletContext()
+                         .getAttribute("salt")));
+
+             e.setPosition_flag(Integer.parseInt(data[3]));
              e.setDelete_flag(Integer.parseInt(data[4]));
              e.setCreated_at(currentTime);
              e.setUpdated_at(currentTime);

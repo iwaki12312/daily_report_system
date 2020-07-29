@@ -32,7 +32,16 @@ import javax.persistence.Table;
     @NamedQuery(
             name = "getMyReportsCount",
             query = "SELECT COUNT(r) FROM Report AS r WHERE r.employee = :employee"
+            ),
+    @NamedQuery(
+            name = "getNotSectionManagerApprovalReports",
+            query = "SELECT r FROM Report AS r WHERE r.section_manager_approval = null AND r.employee <> :login_employee"
+            ),
+    @NamedQuery(
+            name = "getNotManagerApprovalReports",
+            query = "SELECT r FROM Report AS r WHERE r.manager_approval = null AND r.employee <> :login_employee AND r.section_manager_approval <> null"
             )
+
 })
 @Entity
 public class Report {
@@ -60,6 +69,16 @@ public class Report {
 
     @Column(name = "updated_at", nullable = false)
     private Timestamp updated_at;
+
+    @ManyToOne
+    @JoinColumn(name = "section_manager_approval" , nullable = true)
+    private Employee section_manager_approval;
+
+    @ManyToOne
+    @JoinColumn(name = "manager_approval" , nullable = true)
+    private Employee manager_approval;
+
+
 
     public Integer getId() {
         return id;
@@ -115,5 +134,21 @@ public class Report {
 
     public void setUpdated_at(Timestamp updated_at) {
         this.updated_at = updated_at;
+    }
+
+    public Employee getSection_manager_approval() {
+        return section_manager_approval;
+    }
+
+    public void setSection_manager_approval(Employee section_manager_approval) {
+        this.section_manager_approval = section_manager_approval;
+    }
+
+    public Employee getManager_approval() {
+        return manager_approval;
+    }
+
+    public void setManager_approval(Employee manager_approval) {
+        this.manager_approval = manager_approval;
     }
 }
