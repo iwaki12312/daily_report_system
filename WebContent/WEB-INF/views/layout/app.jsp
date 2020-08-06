@@ -7,6 +7,7 @@
         <title>日報管理システム</title>
         <link rel="stylesheet" href="<c:url value='/css/reset.css' />">
         <link rel="stylesheet" href="<c:url value='/css/style.css' />">
+        <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
     </head>
     <body>
         <div id="wrapper">
@@ -17,6 +18,7 @@
                         <c:if test="${sessionScope.login_employee.position_flag != 0}">
                             <a href="<c:url value='/employees/index' />">従業員管理</a>&nbsp;
                         </c:if>
+                        <a href="<c:url value='/clients/index' />">取引先管理</a>&nbsp;
                         <a href="<c:url value='/reports/index' />">日報管理</a>&nbsp;
                         <a href="<c:url value='/follow/index' />">従業員をフォローする</a>&nbsp;
                         <a href="<c:url value='/follow/followemployee' />">フォロー&nbsp;<c:out value="${followCount}"/>&nbsp;人</a>&nbsp;

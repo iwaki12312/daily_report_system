@@ -1,7 +1,6 @@
-package controllers.reports;
+package controllers.clients;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -13,20 +12,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import models.Client;
-import models.Report;
 import utils.DBUtil;
 
 /**
- * Servlet implementation class ReportsNewServlet
+ * Servlet implementation class ClientsIndexServlet
  */
-@WebServlet("/reports/new")
-public class ReportsNewServlet extends HttpServlet {
+@WebServlet("/clients/index")
+public class ClientsIndexServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public ReportsNewServlet() {
+    public ClientsIndexServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -35,18 +33,27 @@ public class ReportsNewServlet extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        EntityManager em = DBUtil.createEntityManager();
-        request.setAttribute("_token", request.getSession().getId());
 
-        Report r = new Report();
-        r.setReport_date(new Date(System.currentTimeMillis()));
-        request.setAttribute("report", r);
+        EntityManager em = DBUtil.createEntityManager();
+
+        int page = 1;
+        try{
+            page = Integer.parseInt(request.getParameter("page"));
+        } catch(NumberFormatException e) { }
 
         List<Client> clients = em.createNamedQuery("getAllClients", Client.class)
-                                                   .getResultList();
-        request.setAttribute("clients", clients);
+                .setFirstResult(15 * (page - 1))
+                .setMaxResults(15)
+                .getResultList();
 
-        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/reports/new.jsp");
+        Long clients_count = (long)em.createNamedQuery("getClientsCount", Long.class)
+                  .getSingleResult();
+
+        request.setAttribute("clients", clients);
+        request.setAttribute("clients_count", clients_count);
+
+
+        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/clients/index.jsp");
         rd.forward(request, response);
     }
 

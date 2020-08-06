@@ -24,6 +24,32 @@
                             </td>
                         </tr>
                         <tr>
+                            <th>取引先</th>
+                            <td>
+                            <c:choose>
+                                <c:when test="${report.client != null}">
+                                   <pre><c:out value="${report.client.name}" /></pre>
+                                </c:when>
+                                <c:otherwise>
+                                   <pre>取引先の登録はありません</pre>
+                                </c:otherwise>
+                            </c:choose>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>商談状況</th>
+                            <td>
+                            <c:choose>
+                                <c:when test="${report.negotiation_status != null}">
+                                   <pre><c:out value="${report.negotiation_status}" /></pre>
+                                </c:when>
+                                <c:otherwise>
+                                   <pre>商談状況の登録はありません</pre>
+                                </c:otherwise>
+                            </c:choose>
+                            </td>
+                        </tr>
+                        <tr>
                             <th>出勤時刻</th>
                             <td>
                             <c:choose>
@@ -116,17 +142,32 @@
              </form>
           </c:when>
         </c:choose>
-        <c:if test="${login_employee.id != employee.id}">
-            <c:if test="${login_employee.position_flag == 2 && report.section_manager_approval == null}">
+        <c:if test="${sessionScope.login_employee.id != employee.id}">
+            <c:if test="${sessionScope.login_employee.position_flag == 2 && report.section_manager_approval == null}">
                 <form class="follow" method="POST" action="<c:url value='/approval?reportId=${report.id}' />">
                       <button>課長承認する</button>
                 </form>
             </c:if>
-            <c:if test="${login_employee.position_flag == 3 && report.section_manager_approval != null && report.manager_approval == null}">
+            <c:if test="${sessionScope.login_employee.position_flag == 3 && report.section_manager_approval != null && report.manager_approval == null}">
                 <form class="follow" method="POST" action="<c:url value='/approval?reportId=${report.id}' />">
                       <button>部長承認する</button>
                 </form>
             </c:if>
         </c:if>
+        <c:if test="${sessionScope.login_employee.id != report.employee.id}">
+            <c:choose>
+                <c:when test="${like == null}">
+                     <form  class="like" method="post" name = "form1" action="<c:url value='/likes?id=${report.id}' />">
+                         <a href="#" onclick="document.form1.submit();return false;"><i id="unlike" class="fas fa-thumbs-up"></i></a>
+                     </form>
+                </c:when>
+                <c:otherwise>
+                     <form class="like" method="post" name = "form2" action="<c:url value='/likes/destroy?id=${report.id}' />">
+                         <a href="#" onclick="document.form2.submit();return false;"><i id="like" class="fas fa-thumbs-up"></i></a>
+                     </form>
+                </c:otherwise>
+            </c:choose>
+        </c:if>
+        <span id="likecount"><a href="<c:url value="/likes/index?id=${report.id}" />">いいね！<c:out value="${likeCount}"/>件</a></span>
     </c:param>
 </c:import>

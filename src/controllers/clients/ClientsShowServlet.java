@@ -1,8 +1,6 @@
-package controllers.reports;
+package controllers.clients;
 
 import java.io.IOException;
-import java.sql.Date;
-import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.servlet.RequestDispatcher;
@@ -13,20 +11,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import models.Client;
-import models.Report;
+import models.Employee;
 import utils.DBUtil;
 
 /**
- * Servlet implementation class ReportsNewServlet
+ * Servlet implementation class ClientsShowServlet
  */
-@WebServlet("/reports/new")
-public class ReportsNewServlet extends HttpServlet {
+@WebServlet("/clients/show")
+public class ClientsShowServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public ReportsNewServlet() {
+    public ClientsShowServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -35,19 +33,20 @@ public class ReportsNewServlet extends HttpServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         EntityManager em = DBUtil.createEntityManager();
-        request.setAttribute("_token", request.getSession().getId());
 
-        Report r = new Report();
-        r.setReport_date(new Date(System.currentTimeMillis()));
-        request.setAttribute("report", r);
+        Client client = em.find(Client.class, Integer.parseInt(request.getParameter("id")));
 
-        List<Client> clients = em.createNamedQuery("getAllClients", Client.class)
-                                                   .getResultList();
-        request.setAttribute("clients", clients);
+        em.close();
 
-        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/reports/new.jsp");
+        Employee login_employee = (Employee)request.getSession().getAttribute("login_employee");
+        request.setAttribute("login_employee", login_employee);
+        request.setAttribute("client", client);
+
+        RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/clients/show.jsp");
         rd.forward(request, response);
+
     }
 
 }

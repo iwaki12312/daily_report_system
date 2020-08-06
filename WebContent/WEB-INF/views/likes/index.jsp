@@ -7,14 +7,6 @@
                 <c:out value="${flush}"></c:out>
             </div>
         </c:if>
-        <div class="search">
-            <h2>従業員　一覧</h2>
-            <p>氏名で検索</p>
-            <form action="index">
-                <input type="text" name="search" value="${search}">
-                <input type="submit" value="検索">
-            </form>
-        </div>
         <table id="employee_list">
             <tbody>
                 <tr>
@@ -24,15 +16,15 @@
                 </tr>
                 <c:forEach var="employee" items="${employees}" varStatus="status">
                     <tr class="row${status.count % 2}">
-                            <td><c:out value="${employee.code}" /></td>
-                            <td><c:out value="${employee.name}" /></td>
+                            <td><c:out value="${employee.employee.code}" /></td>
+                            <td><c:out value="${employee.employee.name}" /></td>
                             <td>
                                 <c:choose>
-                                    <c:when test="${employee.delete_flag == 1}">
+                                    <c:when test="${employee.employee.delete_flag == 1}">
                                         （削除済み）
                                     </c:when>
                                     <c:otherwise>
-                                        <a href="<c:url value='/employees/show?id=${employee.id}' />">詳細を表示</a>
+                                        <a href="<c:url value='/employees/show?id=${employee.employee.id}' />">詳細を表示</a>
                                     </c:otherwise>
                                 </c:choose>
                             </td>
@@ -49,12 +41,12 @@
                         <c:out value="${i}" />&nbsp;
                     </c:when>
                     <c:otherwise>
-                        <a href="<c:url value='/employees/index?page=${i}&search=${search}'/>"><c:out value="${i}" /></a>&nbsp;
+                        <a href="<c:url value='/employees/index?page=${i}'/>"><c:out value="${i}" /></a>&nbsp;
                     </c:otherwise>
                 </c:choose>
             </c:forEach>
         </div>
-        <p><a href="<c:url value='/employees/new' />">新規従業員の登録</a></p>
+        <p><a href="<c:url value='/reports/show?id=${report.id}' />">日報詳細へ戻る</a></p>
 
     </c:param>
 </c:import>

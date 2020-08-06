@@ -39,19 +39,44 @@ public class EmployeesIndexServlet extends HttpServlet {
         try{
             page = Integer.parseInt(request.getParameter("page"));
         } catch(NumberFormatException e) { }
-        List<Employee> employees = em.createNamedQuery("getAllEmployees", Employee.class)
-                                     .setFirstResult(15 * (page - 1))
-                                     .setMaxResults(15)
-                                     .getResultList();
 
-        long employees_count = (long)em.createNamedQuery("getEmployeesCount", Long.class)
-                                       .getSingleResult();
+        List<Employee> employees = null;
+        long employees_count = 0;
+        String search = "";
+
+
+      //検索パラメータが存在しない場合全ての従業員データを検索
+        if(request.getParameter("search") == null){
+            employees = em.createNamedQuery("getAllEmployees", Employee.class)
+                    .setFirstResult(15 * (page - 1))
+                    .setMaxResults(15)
+                    .getResultList();
+
+            employees_count = (long)em.createNamedQuery("getEmployeesCount", Long.class)
+                      .getSingleResult();
+
+        //検索パラメータが存在する場合検索文字列を含むデータを検索
+        }else{
+            search = request.getParameter("search");
+            employees = em.createNamedQuery("getSearchEmployees", Employee.class)
+                    .setParameter("search", "%" + search  + "%")
+                    .setFirstResult(15 * (page - 1))
+                    .setMaxResults(15)
+                    .getResultList();
+
+            employees_count = (long)em.createNamedQuery("getSearchEmployeesCount", Long.class)
+                      .setParameter("search", "%" + search  + "%")
+                      .getSingleResult();
+        }
 
         em.close();
 
         request.setAttribute("employees", employees);
         request.setAttribute("employees_count", employees_count);
         request.setAttribute("page", page);
+        request.setAttribute("search", search);
+
+
         if(request.getSession().getAttribute("flush") != null) {
             request.setAttribute("flush", request.getSession().getAttribute("flush"));
             request.getSession().removeAttribute("flush");

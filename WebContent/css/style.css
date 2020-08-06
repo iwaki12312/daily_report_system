@@ -211,3 +211,30 @@ h3 {
     padding-left: 50px;
     color: #ff0000;
 }
+
+#reportSearch{
+    margin-left: 30px;
+}
+
+.editLink{
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.like{
+    display: inline-block;
+    font-size: 50px;
+    margin-left: 50px;
+}
+
+.like #unlike{
+    color: #CCCCCC;
+}
+
+.like #like{
+    color: #FFA500 ;
+}
+
+#likecount{
+     margin-left: 30px;
+}

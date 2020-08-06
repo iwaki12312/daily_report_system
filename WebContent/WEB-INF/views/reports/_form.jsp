@@ -26,5 +26,20 @@
 <textarea name="content" rows="10" cols="50">${report.content}</textarea>
 <br /><br />
 
+<label for="name">取引先</label><br />
+<select name="client">
+                <option value="">無し</option>
+                <c:forEach var="client" items="${clients}">
+                     <c:if test="${client.delete_flag == 0 || report.client == client}">
+                        <option value="${client.id}"<c:if test="${report.client == client}">selected</c:if>><c:out value="${client.name}" /></option>
+                     </c:if>
+                </c:forEach>
+              </select>
+<br /><br />
+
+<label for="content">商談状況</label><br />
+<textarea name="negotiation_status" rows="10" cols="50">${report.negotiation_status}</textarea>
+<br /><br />
+
 <input type="hidden" name="_token" value="${_token}" />
 <button type="submit">投稿</button>

@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import models.Attendance;
 import models.Employee;
 import models.Follow;
+import models.Like;
 import models.Report;
 import utils.DBUtil;
 
@@ -67,7 +68,6 @@ public class ReportsShowServlet extends HttpServlet {
             e.printStackTrace();
         }
 
-        em.close();
 
         int followCheck_1 = employee.getId();
         int followCheck_2 = login_employee.getId();
@@ -80,10 +80,33 @@ public class ReportsShowServlet extends HttpServlet {
             request.setAttribute("followDeta", 1);
         }
 
+        //いいねをしているかチェック
+
+        Like like = null;
+
+        try{
+            like = em.createNamedQuery("getLikeCheck", Like.class)
+                    .setParameter("employee", login_employee)
+                    .setParameter("report", r)
+                    .getSingleResult();
+        }catch (Exception e) {
+           e.printStackTrace();
+        }
+
+        //表示するレポートのいいね数を取得
+        long likeCount = em.createNamedQuery("getLikeCount", Long.class)
+                .setParameter("report", r)
+                .getSingleResult();
+
+
+
+        em.close();
+
         request.setAttribute("employee", employee);
         request.setAttribute("report", r);
+        request.setAttribute("likeCount", likeCount);
         request.setAttribute("attendance", a);
-        request.setAttribute("login_employee", login_employee);
+        request.setAttribute("like", like);
         request.setAttribute("_token", request.getSession().getId());
 
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/reports/show.jsp");

@@ -1,4 +1,4 @@
-package cntrollers.approval;
+package controllers.approval;
 
 import java.io.IOException;
 import java.util.List;

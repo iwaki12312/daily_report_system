@@ -35,7 +35,7 @@ public class AttendanceRecord extends HttpServlet {
         Employee login_employee = (Employee)request.getSession().getAttribute("login_employee");
         String context_path = ((HttpServletRequest)request).getContextPath();
 
-        if(login_employee.getPosition_flag() == 1 || (login_employee.getId() == employee.getId())){
+        if(login_employee.getPosition_flag() > 0 || (login_employee.getId() == employee.getId())){
 
         Date currentDate = new Date();
         SimpleDateFormat dateFormatYear = new SimpleDateFormat("yyyy");
@@ -45,13 +45,13 @@ public class AttendanceRecord extends HttpServlet {
         String m = request.getParameter("month");
         String y = request.getParameter("year");
 
-        if(Integer.parseInt(m) <= 0 || Integer.parseInt(m) > 12 ){
-            m = dateFormatMonth.format(currentDate);
-        }
+            if(Integer.parseInt(m) <= 0 || Integer.parseInt(m) > 12 ){
+                m = dateFormatMonth.format(currentDate);
+            }
 
-        if(Integer.parseInt(y) < 2010 || Integer.parseInt(y) > Integer.parseInt(dateFormatYear.format(currentDate))){
-            y = dateFormatYear.format(currentDate);
-        }
+            if(Integer.parseInt(y) < 2010 || Integer.parseInt(y) > Integer.parseInt(dateFormatYear.format(currentDate))){
+                y = dateFormatYear.format(currentDate);
+            }
 
         String date = y + "-" + m;
 
@@ -69,9 +69,8 @@ public class AttendanceRecord extends HttpServlet {
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/attendance/attendanceRecord.jsp");
         rd.forward(request, response);
 
-        }else
+        }else{
 
-        {
             ((HttpServletResponse)response).sendRedirect(context_path + "/");
             return;
         }

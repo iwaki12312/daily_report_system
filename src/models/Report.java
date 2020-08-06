@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @NamedQueries({
     @NamedQuery(
             name = "getAllReports",
-            query = "SELECT r FROM Report AS r ORDER BY r.id DESC"
+            query = "SELECT r FROM Report AS r WHERE r.client = :client ORDER BY r.id DESC"
             ),
     @NamedQuery(
             name = "getReportsCount",
@@ -35,13 +35,52 @@ import javax.persistence.Table;
             ),
     @NamedQuery(
             name = "getNotSectionManagerApprovalReports",
-            query = "SELECT r FROM Report AS r WHERE r.section_manager_approval = null AND r.employee <> :login_employee"
+            query = "SELECT r FROM Report AS r WHERE r.section_manager_approval = null AND r.employee <> :login_employee ORDER BY r.id DESC"
             ),
     @NamedQuery(
             name = "getNotManagerApprovalReports",
-            query = "SELECT r FROM Report AS r WHERE r.manager_approval = null AND r.employee <> :login_employee AND r.section_manager_approval <> null"
+            query = "SELECT r FROM Report AS r WHERE r.manager_approval = null AND r.employee <> :login_employee AND r.section_manager_approval <> null ORDER BY r.id DESC"
+            ),
+    @NamedQuery(
+            name = "getNotSectionManagerApprovalIndex",
+            query = "SELECT r FROM Report AS r WHERE r.section_manager_approval = null ORDER BY r.id DESC"
+            ),
+    @NamedQuery(
+            name = "getNotManagerApprovalIndex",
+            query = "SELECT r FROM Report AS r WHERE r.manager_approval = null AND r.section_manager_approval <> null ORDER BY r.id DESC"
+            ),
+    @NamedQuery(
+            name = "getApprovedReportsIndex",
+            query = "SELECT r FROM Report AS r WHERE r.manager_approval <> null AND r.section_manager_approval <> null ORDER BY r.id DESC"
+            ),
+    @NamedQuery(
+            name = "getNotSectionManagerApprovalCount",
+            query = "SELECT COUNT(r) FROM Report AS r WHERE r.section_manager_approval = null"
+            ),
+    @NamedQuery(
+            name = "getNotManagerApprovalCount",
+            query = "SELECT COUNT(r) FROM Report AS r WHERE r.manager_approval = null AND r.section_manager_approval <> null"
+            ),
+    @NamedQuery(
+            name = "getApprovedReportsCount",
+            query = "SELECT COUNT(r) FROM Report AS r WHERE r.manager_approval <> null AND r.section_manager_approval <> null"
+            ),
+    @NamedQuery(
+            name = "getMyApprovedReportsIndex",
+            query = "SELECT r FROM Report AS r WHERE r.manager_approval = :login_employee OR r.section_manager_approval = :login_employee ORDER BY r.id DESC"
+            ),
+    @NamedQuery(
+            name = "getMyApprovedReportsCount",
+            query = "SELECT COUNT(r) FROM Report AS r WHERE r.manager_approval = :login_employee OR r.section_manager_approval = :login_employee"
+            ),
+    @NamedQuery(
+            name = "getClientReports",
+            query = "SELECT r FROM Report AS r WHERE r.client = :client ORDER BY r.id DESC"
+            ),
+    @NamedQuery(
+            name = "getClientReportsCount",
+            query = "SELECT COUNT(r) FROM Report AS r WHERE r.client = :client"
             )
-
 })
 @Entity
 public class Report {
@@ -77,6 +116,13 @@ public class Report {
     @ManyToOne
     @JoinColumn(name = "manager_approval" , nullable = true)
     private Employee manager_approval;
+
+    @ManyToOne
+    @JoinColumn(name = "client_id" , nullable = true)
+    private Client client;
+
+    @Column(name = "negotiation_status", length = 255)
+    private String negotiation_status;
 
 
 
@@ -150,5 +196,21 @@ public class Report {
 
     public void setManager_approval(Employee manager_approval) {
         this.manager_approval = manager_approval;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
+    }
+
+    public String getNegotiation_status() {
+        return negotiation_status;
+    }
+
+    public void setNegotiation_status(String negotiation_status) {
+        this.negotiation_status = negotiation_status;
     }
 }

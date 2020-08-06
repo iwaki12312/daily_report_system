@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import models.Client;
 import models.Employee;
 import models.Report;
 import models.validators.ReportValidator;
@@ -54,6 +55,8 @@ public class ReportsCreateServlet extends HttpServlet {
 
             r.setTitle(request.getParameter("title"));
             r.setContent(request.getParameter("content"));
+            r.setClient(em.find(Client.class, Integer.parseInt(request.getParameter("client"))));
+            r.setNegotiation_status(request.getParameter("negotiation_status"));
 
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             r.setCreated_at(currentTime);

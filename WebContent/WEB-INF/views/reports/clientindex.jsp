@@ -8,35 +8,7 @@
                 <c:out value="${flush}"></c:out>
             </div>
         </c:if>
-        <div class="search">
-          <h2>日報　一覧</h2>
-          <form action="index" id="reportSearch">
-          <p>承認ステータス</p>
-              <select name="filter">
-                <option value="">全て表示</option>
-                <option value="sectionManager"<c:if test="${filter == 'sectionManager'}">selected</c:if>>課長承認待ち</option>
-                <option value="manager"<c:if test="${filter == 'manager'}">selected</c:if>>部長承認待ち</option>
-                <option value="approved"<c:if test="${filter == 'approved'}">selected</c:if>>承認済み</option>
-                <c:if test="${login_employee.position_flag > 1}">
-                  <option value="myApproved"<c:if test="${filter == 'myApproved'}">selected</c:if>>自分が承認した日報</option>
-                </c:if>
-              </select>
-              <p>取引先</p>
-              <select name="clientFilter">
-                <option value="">全て表示</option>
-                <c:forEach var="client" items="${clients}">
-                   <option value="${client.id}"<c:if test="${clientFilter == client.id}">selected</c:if>><c:out value="${client.name}" /></option>
-                </c:forEach>
-              </select>
-              <p>いいね！</p>
-              <select name="likeFilter">
-                  <option value="">全て表示</option>
-                  <option value="on"<c:if test="${likeFilter == 'on'}">selected</c:if>>自分がいいねした日報</option>
-              </select>
-              <input type="submit" value="絞り込み">
-          </form>
-
-        </div>
+          <h2><c:out value="${client.name}"/>に関する日報一覧</h2>
         <table id="report_list">
             <tbody>
                 <tr>
@@ -69,7 +41,7 @@
                 </c:choose>
             </c:forEach>
         </div>
-        <p><a href="<c:url value='/reports/new' />">新規日報の登録</a></p>
+        <p><a href="<c:url value='/clients/show?id=${client.id}'/>">取引先詳細へ戻る</a></p>
 
     </c:param>
 </c:import>
