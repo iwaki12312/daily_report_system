@@ -37,6 +37,17 @@ public class FollowRemove extends HttpServlet {
 
         Employee login_employee = (Employee)request.getSession().getAttribute("login_employee");
 
+        int page;
+        try{
+            page = Integer.parseInt(request.getParameter("page"));
+        } catch(Exception e) {
+            page = 1;
+        }
+        String search = request.getParameter("search");
+        String followsearch = request.getParameter("followsearch");
+        String followersearch = request.getParameter("followersearch");
+
+
         int reportId = 0;
         if(request.getParameter("reportId") != null){
         reportId =  Integer.parseInt(request.getParameter("reportId"));
@@ -67,8 +78,8 @@ public class FollowRemove extends HttpServlet {
 
             try{
                 b = em.createNamedQuery("getFollows", Follow.class)
-                .setParameter("employee_id", login_employee.getId())
-                .setParameter("follow", employee.getId())
+                .setParameter("employee", login_employee)
+                .setParameter("follow", employee)
                 .getSingleResult();
 
             }catch (Exception e) {
@@ -93,8 +104,8 @@ public class FollowRemove extends HttpServlet {
 
             try{
                 b = em.createNamedQuery("getFollows", Follow.class)
-                .setParameter("employee_id", login_employee.getId())
-                .setParameter("follow", employee.getId())
+                .setParameter("employee", login_employee)
+                .setParameter("follow", employee)
                 .getSingleResult();
 
             }catch (Exception e) {
@@ -119,8 +130,8 @@ public class FollowRemove extends HttpServlet {
 
             try{
                 b = em.createNamedQuery("getFollows", Follow.class)
-                .setParameter("employee_id", login_employee.getId())
-                .setParameter("follow", employee.getId())
+                .setParameter("employee", login_employee)
+                .setParameter("follow", employee)
                 .getSingleResult();
 
             }catch (Exception e) {
@@ -145,8 +156,8 @@ public class FollowRemove extends HttpServlet {
 
             try{
                 b = em.createNamedQuery("getFollows", Follow.class)
-                .setParameter("employee_id", login_employee.getId())
-                .setParameter("follow", employee.getId())
+                .setParameter("employee", login_employee)
+                .setParameter("follow", employee)
                 .getSingleResult();
 
             }catch (Exception e) {
@@ -160,10 +171,12 @@ public class FollowRemove extends HttpServlet {
                 em.getTransaction().commit();
                 em.close();
 
-                response.sendRedirect(request.getContextPath() + "/follow/index");
+                response.sendRedirect(request.getContextPath() + "/follow/index?page=" + page
+                        +"&search=" + search + "&followsearch=" + followsearch + "&followersearch=" + followersearch);
             }else{
                 em.close();
-                response.sendRedirect(request.getContextPath() + "/follow/index");
+                response.sendRedirect(request.getContextPath() + "/follow/index?page=" + page
+                        +"&search=" + search + "&followsearch=" + followsearch + "&followersearch=" + followersearch);
             }
         }
 

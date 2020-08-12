@@ -50,12 +50,12 @@
                       <td>
                          <c:choose>
                             <c:when test="${followCheck[status.count - 1] == 0}">
-                               <form class="follow" method="POST" action="<c:url value='/follow?indexId=${employee.id}' />">
+                               <form class="follow" method="POST" action="<c:url value='/follow?indexId=${employee.id}&page=${page}&search=${name}&followsearch=${followsearch}&followersearch=${followersearch}' />">
                                   <button>フォローする</button>
                                </form>
                             </c:when>
                             <c:when test="${followCheck[status.count - 1] == 1}">
-                               <form class="follow" method="POST" action="<c:url value='/follow/remove?indexId=${employee.id}' />">
+                               <form class="follow" method="POST" action="<c:url value='/follow/remove?indexId=${employee.id}&page=${page}&search=${name}&followsearch=${followsearch}&followersearch=${followersearch}' />">
                                  <button>フォロー解除</button>
                                </form>
                             </c:when>
@@ -74,7 +74,7 @@
                         <c:out value="${i}" />&nbsp;
                     </c:when>
                     <c:otherwise>
-                        <a href="<c:url value='/follow/index?page=${i}' />"><c:out value="${i}" /></a>&nbsp;
+                        <a href="<c:url value='/follow/index?page=${i}&search=${name}&followsearch=${followsearch}&followersearch=${followersearch}' />"><c:out value="${i}" /></a>&nbsp;
                     </c:otherwise>
                 </c:choose>
             </c:forEach>

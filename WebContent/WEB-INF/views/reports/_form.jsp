@@ -42,4 +42,16 @@
 <br /><br />
 
 <input type="hidden" name="_token" value="${_token}" />
-<button type="submit">投稿</button>
+<input type="hidden" name="approval_status" value="${report.approval_status}" />
+<c:if test="${report.content == null || report.approval_status == 0 || report.approval_status == 2 || report.approval_status == 4}">
+    <input type="submit" name="cmd" value="保存"/>
+</c:if>
+<c:if test="${report.content == null || report.approval_status == 0}">
+    <input type="submit" name="cmd" value="提出する"/>
+</c:if>
+<c:if test="${report.approval_status == 2 || report.approval_status == 4}">
+    <input type="submit" name="cmd" value="再提出する"/>
+</c:if>
+<c:if test="${report.approval_status == 1 || report.approval_status == 3}">
+    <input type="submit" name="cmd" value="取り下げる"/>
+</c:if>

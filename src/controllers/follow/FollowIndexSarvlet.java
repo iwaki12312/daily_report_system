@@ -2,7 +2,6 @@ package controllers.follow;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -12,7 +11,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import models.Employee;
 import models.Follow;
@@ -39,192 +37,129 @@ public class FollowIndexSarvlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         EntityManager em = DBUtil.createEntityManager();
         Employee login_employee = (Employee)request.getSession().getAttribute("login_employee");
-        HttpSession session = request.getSession();
 
-
-        String name = (String)session.getAttribute("name");
-
-        if(name == null){
-            name = "";
+        // 名前検索用の文字列を取得
+        String nameStr = request.getParameter("search");
+        String nameFilter = null;
+        if(nameStr == null || nameStr.equals("")){
+            nameFilter = " 1 = 1 "; // 検索文字列が空の場合は全てtrueになる条件をクエリに挿入
+        }else{
+            nameFilter = " e.name LIKE '%" + nameStr + "%'"; // 検索文字列が存在する場合文字列を含むレコードを検索
         }
 
-        if(request.getParameter("search") != null){
-            name = (String)request.getParameter("search");
-            session.setAttribute("name", name);
-        }
+        // フォローしてる従業員検索用のパラメータ取得
+        String followStr = request.getParameter("followsearch");
 
+        // フォローされている従業員検索用のパラメータ取得
+        String followerStr = request.getParameter("followersearch");
 
-        //  検索文字列を含むリストを取得
-        List<Employee> employees = em.createNamedQuery("getFollowEmployeesIndex", Employee.class)
-                .setParameter("employee_id", login_employee.getId())
-                .setParameter("name", "%" + name + "%")
-                .getResultList();
+        //検索するテーブルを結合したクエリ
+        String searchTable = " FROM Employee e LEFT OUTER JOIN Follow f ON e.id = f.employee.id LEFT OUTER JOIN Follow j ON f.follow = j.employee WHERE ";
 
-
-        String followsearch = (String)session.getAttribute("followsearch");
-        if(followsearch == null){
-            followsearch = "off";
-        }
-
-        String followersearch = (String)session.getAttribute("followersearch");
-        if(followersearch == null){
-            followersearch = "off";
-        }
-
-        if(request.getParameter("followsearch") != null){
-            followsearch = (String)request.getParameter("followsearch");
-            session.setAttribute("followsearch", followsearch);
-        }
-
-        if(request.getParameter("followersearch") != null){
-            followersearch = (String)request.getParameter("followersearch");
-            session.setAttribute("followersearch", followersearch);
-        }
-
-        if(followsearch.equals("on") && followersearch.equals("on")){  // 相互フォロー以外のユーザーを除外
-
-                Iterator<Employee> it = employees.iterator();
-                while (it.hasNext()) {
-
-                Employee employee = it.next();
-
-                Follow follow = null;
-                Follow follower = null;
-
-                try{
-                    follow = em.createNamedQuery("getFollows", Follow.class)
-                            .setParameter("employee_id", login_employee.getId())
-                            .setParameter("follow", employee.getId())
-                            .getSingleResult();
-                }catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                try{
-                    follower = em.createNamedQuery("getFollowers", Follow.class)
-                            .setParameter("login_employee_id", login_employee.getId())
-                            .setParameter("employee_id", employee.getId())
-                            .getSingleResult();
-                }catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                if(follow == null || follower == null)it.remove();
-            }
-        }else if(followsearch.equals("on")){    // フォローしている従業員以外を除外
-            Iterator<Employee> it = employees.iterator();
-            while (it.hasNext()) {
-
-            Employee employee = it.next();
-
-            Follow follow = null;
-
-            try{
-                follow = em.createNamedQuery("getFollows", Follow.class)
-                        .setParameter("employee_id", login_employee.getId())
-                        .setParameter("follow", employee.getId())
-                        .getSingleResult();
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            if(follow == null)it.remove();
-
-            }
-        }else if(followersearch.equals("on")){    // フォローされている従業員以外を除外
-            Iterator<Employee> it = employees.iterator();
-            while (it.hasNext()) {
-
-            Employee employee = it.next();
-
-            Follow follower = null;
-
-            try{
-                follower = em.createNamedQuery("getFollowers", Follow.class)
-                        .setParameter("login_employee_id", login_employee.getId())
-                        .setParameter("employee_id", employee.getId())
-                        .getSingleResult();
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            if(follower == null)it.remove();
-
-            }
-
-        }
-
-
-        int page = 1;
-
-        if(request.getParameter("followsearch") != null){  // 検索ボタンが押された場合(followsearchパラメータは必ず入る為)
-            session.removeAttribute("page");
-        }
-
-        if(session.getAttribute("page") != null){
-            page = (Integer)session.getAttribute("page");
-
-        }
-
+        //ページネーション用パラメータ
+        int page;
         try{
             page = Integer.parseInt(request.getParameter("page"));
-            session.setAttribute("page", page);
-        } catch(NumberFormatException e) { }
-
-
-        int employees_count = employees.size();
-
-
-
-        // ページネーション用に15件ずつ切り取り
-        List<Employee> displayEmployees = new ArrayList<Employee>();
-
-        employees.subList(0, (page - 1) * 15).clear();
-
-        Iterator <Employee> it = employees.iterator();
-        int i = 0;
-        while (it.hasNext() && i < 15) {
-            displayEmployees.add(it.next());
-
-            i++;
-
+        } catch(Exception e) {
+            page = 1;
         }
 
 
-        int followCheck[] = new int[displayEmployees.size()];
-        int j = 0;
-        for(Employee employee : displayEmployees){
+        List<Employee> employees = new ArrayList<Employee>();
+        long employees_count = 0;
+
+        //フォローステータスによる絞り込みが無い場合の検索
+        if((followStr == null || followStr.equals("") || followStr.equals("off"))
+                && (followerStr == null || followerStr.equals("") || followerStr.equals("off"))){
+
+            employees = em.createQuery("SELECT distinct e " + searchTable + nameFilter + " ORDER BY e.id DESC", Employee.class)
+                    .setFirstResult(15 * (page - 1))
+                    .setMaxResults(15)
+                    .getResultList();
+
+            employees_count = (long)em.createQuery("SELECT COUNT(DISTINCT e) " + searchTable + nameFilter, Long.class)
+                    .getSingleResult();
+        }else if(followStr.equals("on") && followerStr.equals("off")){ //フォローしてるユーザーを取得
+
+            employees =  em.createQuery("SELECT distinct f.follow " + searchTable + nameFilter
+                    + " AND f.employee = :login_employee ORDER BY f.follow.id DESC",Employee.class)
+                    .setParameter("login_employee", login_employee)
+                    .setFirstResult(15 * (page - 1))
+                    .setMaxResults(15)
+                    .getResultList();
+
+            employees_count = (long)em.createQuery("SELECT COUNT(DISTINCT f.follow) " + searchTable + nameFilter
+                    + " AND f.employee = :login_employee" , Long.class)
+                    .setParameter("login_employee", login_employee)
+                    .getSingleResult();
+
+
+        }else if(followStr.equals("off") && followerStr.equals("on")){ //フォローされているユーザーを取得
+
+            employees =  em.createQuery("SELECT distinct e " + searchTable + nameFilter
+                    + " AND f.follow = :login_employee ORDER BY e.id DESC",Employee.class)
+                    .setParameter("login_employee", login_employee)
+                    .setFirstResult(15 * (page - 1))
+                    .setMaxResults(15)
+                    .getResultList();
+
+            employees_count = (long)em.createQuery("SELECT COUNT(DISTINCT e) " + searchTable + nameFilter
+                    + " AND f.follow = :login_employee" , Long.class)
+                    .setParameter("login_employee", login_employee)
+                    .getSingleResult();
+
+
+        }else if(followStr.equals("on") && followerStr.equals("on")){ //相互フォローのユーザーを取得
+
+            employees =  em.createQuery("SELECT distinct e " + searchTable + nameFilter
+                    + " AND j.follow = f.employee AND f.follow = :login_employee ORDER BY e.id DESC",Employee.class)
+                    .setParameter("login_employee", login_employee)
+                    .setFirstResult(15 * (page - 1))
+                    .setMaxResults(15)
+                    .getResultList();
+
+            employees_count = (long)em.createQuery("SELECT COUNT(DISTINCT e) " + searchTable + nameFilter
+                    + " AND j.follow = f.employee AND f.follow = :login_employee" , Long.class)
+                    .setParameter("login_employee", login_employee)
+                    .getSingleResult();
+
+        }
+
+        int followCheck[] = new int[employees.size()];
+        int i = 0;
+        for(Employee employee : employees){
             Follow follow = null;
 
             try{
                 follow = em.createNamedQuery("getFollows", Follow.class)
-                        .setParameter("employee_id", login_employee.getId())
-                        .setParameter("follow", employee.getId())
+                        .setParameter("employee", login_employee)
+                        .setParameter("follow", employee)
                         .getSingleResult();
             }catch (Exception e) {
                 e.printStackTrace();
             }
 
             if(follow == null){
-                followCheck[j] = 0;
+                followCheck[i] = 0;
             }else{
-                followCheck[j] = 1;
+                followCheck[i] = 1;
             }
 
-            j++;
+            i++;
         }
+
 
 
         em.close();
 
-        request.setAttribute("followCheck", followCheck);
-        request.setAttribute("employees", displayEmployees);
         request.setAttribute("employees_count", employees_count);
+        request.setAttribute("employees", employees);
         request.setAttribute("page", page);
         request.setAttribute("login_employee", login_employee);
-        request.setAttribute("name", name);
-        request.setAttribute("followsearch", followsearch);
-        request.setAttribute("followersearch", followersearch);
+        request.setAttribute("name", nameStr);
+        request.setAttribute("followsearch", followStr);
+        request.setAttribute("followersearch", followerStr);
+        request.setAttribute("followCheck", followCheck);
 
 
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/follow/index.jsp");

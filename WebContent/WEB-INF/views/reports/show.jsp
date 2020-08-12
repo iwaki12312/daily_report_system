@@ -76,6 +76,43 @@
                             </c:choose>
                             </td>
                         </tr>
+                         <tr>
+                            <th>承認ステータス</th>
+                            <td>
+                                <c:if test="${report.approval_status == 0}">
+                                    <pre>編集中</pre>
+                                </c:if>
+                                <c:if test="${report.approval_status == 1}">
+                                    <pre>課長承認待ち</pre>
+                                </c:if>
+                                <c:if test="${report.approval_status == 2}">
+                                    <pre>課長差し戻し</pre>
+                                </c:if>
+                                <c:if test="${report.approval_status == 3}">
+                                    <pre>部長承認待ち</pre>
+                                </c:if>
+                                <c:if test="${report.approval_status == 4}">
+                                    <pre>部長差し戻し</pre>
+                                </c:if>
+                                <c:if test="${report.approval_status == 5}">
+                                    <pre>承認済み</pre>
+                                </c:if>
+                            </td>
+                        </tr>
+                        <c:if test="${report.repudiation_user != null}">
+                            <tr>
+                                <th>否認したユーザー</th>
+                                <td>
+                                    <pre><c:out value="${report.repudiation_user.name}" /></pre>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>否認理由</th>
+                                <td>
+                                    <pre><c:out value="${report.denial_text}" /></pre>
+                                </td>
+                            </tr>
+                        </c:if>
                         <tr>
                             <th>課長承認</th>
                             <td>
@@ -143,14 +180,21 @@
           </c:when>
         </c:choose>
         <c:if test="${sessionScope.login_employee.id != employee.id}">
-            <c:if test="${sessionScope.login_employee.position_flag == 2 && report.section_manager_approval == null}">
+            <c:if test="${sessionScope.login_employee.position_flag == 2 && report.approval_status == 1}">
                 <form class="follow" method="POST" action="<c:url value='/approval?reportId=${report.id}' />">
+                      <input type="hidden" name="approval_status" value="${report.approval_status}" />
                       <button>課長承認する</button>
                 </form>
             </c:if>
-            <c:if test="${sessionScope.login_employee.position_flag == 3 && report.section_manager_approval != null && report.manager_approval == null}">
+            <c:if test="${sessionScope.login_employee.position_flag == 3 && report.approval_status == 3}">
                 <form class="follow" method="POST" action="<c:url value='/approval?reportId=${report.id}' />">
+                      <input type="hidden" name="approval_status" value="${report.approval_status}" />
                       <button>部長承認する</button>
+                </form>
+            </c:if>
+            <c:if test="${(sessionScope.login_employee.position_flag == 2 && report.approval_status == 1) || (sessionScope.login_employee.position_flag == 3 && report.approval_status == 3)}">
+                <form class="follow" method="GET" action="<c:url value='/reports/repudiation' />">
+                      <button name="reportId" type="submit" value="${report.id}">否認する</button>
                 </form>
             </c:if>
         </c:if>

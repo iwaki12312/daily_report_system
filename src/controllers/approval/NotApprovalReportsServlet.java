@@ -46,7 +46,7 @@ public class NotApprovalReportsServlet extends HttpServlet {
         }
 
         List<Report> reports = null;
-
+        long reports_count = 0;
 
         // ユーザーが課長だった場合課長承認待ちのレポートを取得
         if(Integer.parseInt(request.getParameter("position")) == 2){
@@ -55,6 +55,10 @@ public class NotApprovalReportsServlet extends HttpServlet {
                     .setFirstResult(15 * (page - 1))
                     .setMaxResults(15)
                     .getResultList();
+
+           reports_count = em.createNamedQuery("getNotSectionManagerApprovalCount", Long.class)
+                   .setParameter("login_employee", login_employee)
+                   .getSingleResult();
         }
 
         // ユーザーが部長だった場合部長承認待ちのレポートを取得
@@ -64,6 +68,10 @@ public class NotApprovalReportsServlet extends HttpServlet {
                      .setFirstResult(15 * (page - 1))
                      .setMaxResults(15)
                      .getResultList();
+
+            reports_count = em.createNamedQuery("getNotManagerApprovalCount", Long.class)
+                    .setParameter("login_employee", login_employee)
+                    .getSingleResult();
          }
 
 
@@ -74,7 +82,7 @@ public class NotApprovalReportsServlet extends HttpServlet {
         request.getSession().setAttribute("approvalRedirectFlag" , "approvalIndex");
 
         request.setAttribute("reports", reports);
-        request.setAttribute("reports_count", reports.size());
+        request.setAttribute("reports_count", reports_count);
         request.setAttribute("page", page);
         request.setAttribute("login_employee", login_employee);
 

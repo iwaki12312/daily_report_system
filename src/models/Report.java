@@ -35,43 +35,19 @@ import javax.persistence.Table;
             ),
     @NamedQuery(
             name = "getNotSectionManagerApprovalReports",
-            query = "SELECT r FROM Report AS r WHERE r.section_manager_approval = null AND r.employee <> :login_employee ORDER BY r.id DESC"
+            query = "SELECT r FROM Report AS r WHERE r.approval_status = 1 AND r.employee <> :login_employee ORDER BY r.id DESC"
             ),
     @NamedQuery(
             name = "getNotManagerApprovalReports",
-            query = "SELECT r FROM Report AS r WHERE r.manager_approval = null AND r.employee <> :login_employee AND r.section_manager_approval <> null ORDER BY r.id DESC"
-            ),
-    @NamedQuery(
-            name = "getNotSectionManagerApprovalIndex",
-            query = "SELECT r FROM Report AS r WHERE r.section_manager_approval = null ORDER BY r.id DESC"
-            ),
-    @NamedQuery(
-            name = "getNotManagerApprovalIndex",
-            query = "SELECT r FROM Report AS r WHERE r.manager_approval = null AND r.section_manager_approval <> null ORDER BY r.id DESC"
-            ),
-    @NamedQuery(
-            name = "getApprovedReportsIndex",
-            query = "SELECT r FROM Report AS r WHERE r.manager_approval <> null AND r.section_manager_approval <> null ORDER BY r.id DESC"
+            query = "SELECT r FROM Report AS r WHERE r.approval_status = 3 AND r.employee <> :login_employee ORDER BY r.id DESC"
             ),
     @NamedQuery(
             name = "getNotSectionManagerApprovalCount",
-            query = "SELECT COUNT(r) FROM Report AS r WHERE r.section_manager_approval = null"
+            query = "SELECT COUNT(r) FROM Report AS r WHERE r.approval_status = 1 AND r.employee <> :login_employee"
             ),
     @NamedQuery(
             name = "getNotManagerApprovalCount",
-            query = "SELECT COUNT(r) FROM Report AS r WHERE r.manager_approval = null AND r.section_manager_approval <> null"
-            ),
-    @NamedQuery(
-            name = "getApprovedReportsCount",
-            query = "SELECT COUNT(r) FROM Report AS r WHERE r.manager_approval <> null AND r.section_manager_approval <> null"
-            ),
-    @NamedQuery(
-            name = "getMyApprovedReportsIndex",
-            query = "SELECT r FROM Report AS r WHERE r.manager_approval = :login_employee OR r.section_manager_approval = :login_employee ORDER BY r.id DESC"
-            ),
-    @NamedQuery(
-            name = "getMyApprovedReportsCount",
-            query = "SELECT COUNT(r) FROM Report AS r WHERE r.manager_approval = :login_employee OR r.section_manager_approval = :login_employee"
+            query = "SELECT COUNT(r) FROM Report AS r WHERE r.approval_status = 3 AND r.employee <> :login_employee"
             ),
     @NamedQuery(
             name = "getClientReports",
@@ -80,7 +56,25 @@ import javax.persistence.Table;
     @NamedQuery(
             name = "getClientReportsCount",
             query = "SELECT COUNT(r) FROM Report AS r WHERE r.client = :client"
-            )
+            ),
+    @NamedQuery(
+            name = "getRejectReports",
+            query = "SELECT r FROM Report AS r WHERE r.employee = :login_employee AND r.approval_status IN (2 , 4) ORDER BY r.id DESC"
+            ),
+    @NamedQuery(
+            name = "getEditingReports",
+            query = "SELECT r FROM Report AS r WHERE r.employee = :login_employee AND r.approval_status = 0 ORDER BY r.id DESC"
+            ),
+    @NamedQuery(
+            name = "getRejectReportsCount",
+            query = "SELECT COUNT(r) FROM Report AS r WHERE r.employee = :login_employee AND r.approval_status IN (2 , 4)"
+            ),
+    @NamedQuery(
+            name = "getEditingReportsCount",
+            query = "SELECT COUNT(r) FROM Report AS r WHERE r.employee = :login_employee AND r.approval_status = 0"
+            ),
+
+
 })
 @Entity
 public class Report {
@@ -123,6 +117,16 @@ public class Report {
 
     @Column(name = "negotiation_status", length = 255)
     private String negotiation_status;
+
+    @Column(name = "approval_status", nullable = false)
+    private Integer approval_status;
+
+    @Column(name = "denial_text" , length = 255)
+    private String  denial_text;
+
+    @ManyToOne
+    @JoinColumn(name = "repudiation_user")
+    private Employee  repudiation_user;
 
 
 
@@ -212,5 +216,29 @@ public class Report {
 
     public void setNegotiation_status(String negotiation_status) {
         this.negotiation_status = negotiation_status;
+    }
+
+    public Integer getApproval_status() {
+        return approval_status;
+    }
+
+    public void setApproval_status(Integer approval_status) {
+        this.approval_status = approval_status;
+    }
+
+    public String getDenial_text() {
+        return denial_text;
+    }
+
+    public void setDenial_text(String denial_text) {
+        this.denial_text = denial_text;
+    }
+
+    public Employee getRepudiation_user() {
+        return repudiation_user;
+    }
+
+    public void setRepudiation_user(Employee repudiation_user) {
+        this.repudiation_user = repudiation_user;
     }
 }

@@ -61,8 +61,8 @@ public class ReportsShowServlet extends HttpServlet {
 
         try{
             b = em.createNamedQuery("getFollows", Follow.class)
-            .setParameter("employee_id", login_employee.getId())
-            .setParameter("follow", employee.getId())
+            .setParameter("employee", login_employee)
+            .setParameter("follow", employee)
             .getSingleResult();
         }catch (Exception e) {
             e.printStackTrace();

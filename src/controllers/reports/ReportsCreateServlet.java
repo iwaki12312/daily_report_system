@@ -43,7 +43,6 @@ public class ReportsCreateServlet extends HttpServlet {
             EntityManager em = DBUtil.createEntityManager();
 
             Report r = new Report();
-
             r.setEmployee((Employee)request.getSession().getAttribute("login_employee"));
 
             Date report_date = new Date(System.currentTimeMillis());
@@ -55,12 +54,26 @@ public class ReportsCreateServlet extends HttpServlet {
 
             r.setTitle(request.getParameter("title"));
             r.setContent(request.getParameter("content"));
-            r.setClient(em.find(Client.class, Integer.parseInt(request.getParameter("client"))));
-            r.setNegotiation_status(request.getParameter("negotiation_status"));
 
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
             r.setCreated_at(currentTime);
             r.setUpdated_at(currentTime);
+
+            //取引先が選択されている場合は取引先と商談状況を登録
+            String clientId = request.getParameter("client");
+            if(!clientId.equals("")){
+                r.setClient(em.find(Client.class , Integer.parseInt(clientId)));
+                r.setNegotiation_status(request.getParameter("negotiation_status"));
+            }
+
+            //提出ボタンが押された場合は承認ステータスを承認待ちに変更
+            String cmd = request.getParameter("cmd");
+            if(cmd.equals("提出する")){
+                r.setApproval_status(1);
+            }else{
+                r.setApproval_status(0);
+            }
+
 
             List<String> errors = ReportValidator.validate(r);
             if(errors.size() > 0) {

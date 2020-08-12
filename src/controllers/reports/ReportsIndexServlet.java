@@ -45,90 +45,57 @@ public class ReportsIndexServlet extends HttpServlet {
             page = 1;
         }
 
-        List<Report> reports = null;
-        long reports_count = 0;
 
-        // 絞り込み検索用のパラメータ取得
-        String filter = request.getParameter("filter");
-        String clientFilter = request.getParameter("clientFilter");
-        String clientFilterStr = null;
+        // 承認ステータスによる検索用のパラメータ取得、対応する検索条件のクエリを代入
+        String filterStr = request.getParameter("filter");
+        String filter = null;
+        if(filterStr == null || filterStr.equals("")){
+            filter = "1 = 1"; //全て表示の場合は全てtrueになる条件を挿入
+        }else if(filterStr.equals("sectionManager")){
+            filter = "r.section_manager_approval = null";
+        }else if(filterStr.equals("manager")){
+            filter = "r.manager_approval = null AND r.section_manager_approval <> null";
+        }else if(filterStr.equals("approved")){
+            filter = "r.manager_approval <> null AND r.section_manager_approval <> null";
+        }else if(filterStr.equals("myApproved")){
+            filter = "(r.manager_approval.id =" + login_employee.getId() + " OR r.section_manager_approval.id =" + login_employee.getId() + ")";
+        }
+
+
+        //取引先による検索用のパラメータ取得、対応する検索条件のクエリを代入
+        String clientFilterStr = request.getParameter("clientFilter");
+        String clientFilter = null;
         Client client = null;
-        String likeFilter = request.getParameter("likeFilter");;
-        String likeFilterStr = null;
 
-        //取引先による絞り込みがある場合のフィルター
-        if(clientFilter == null || clientFilter.equals("")){
-            clientFilterStr = "1 = 1"; //全て表示の場合は全てtrueになる条件を挿入
+        if(clientFilterStr == null || clientFilterStr.equals("")){
+            clientFilter = " AND 1 = 1"; //全て表示の場合は全てtrueになる条件を挿入
         }else{
-            client = em.find(Client.class, Integer.parseInt(clientFilter));
-            clientFilterStr = "r.client.id = " + client.getId();
+            client = em.find(Client.class, Integer.parseInt(clientFilterStr));
+            clientFilter = " AND r.client.id = " + client.getId();
         }
 
-        //いいねによる絞り込みがある場合のフィルター
-        if(likeFilter == null || likeFilter.equals("")){
-            likeFilterStr = " AND 1 = 1"; //全て表示の場合は全てtrueになる条件を挿入
+        //いいねによる検索用のパラメータ取得、対応する検索条件のクエリを代入
+        String likeFilterStr = request.getParameter("likeFilter");;
+        String likeFilter = null;
+
+        if(likeFilterStr == null || likeFilterStr.equals("")){
+            likeFilter = " AND 1 = 1"; //全て表示の場合は全てtrueになる条件を挿入
         }else{
-            likeFilterStr = " AND l.employee.id =" + login_employee.getId();
+            likeFilter = " AND l.employee.id =" + login_employee.getId();
         }
 
-        //検索用テーブルの結合クエリ
+        //検索するテーブルを結合したクエリ
         String query = "SELECT distinct r FROM Report AS r LEFT OUTER JOIN Like AS l ON r.id = l.report.id WHERE ";
         String queryCount = "SELECT COUNT(DISTINCT r) FROM Report AS r LEFT OUTER JOIN Like AS l ON r.id = l.report.id WHERE ";
 
+        //検索
+        List<Report> reports = em.createQuery(query + filter + clientFilter + likeFilter + " ORDER BY r.id DESC", Report.class)
+                .setFirstResult(15 * (page - 1))
+                .setMaxResults(15)
+                .getResultList();
 
-        //以下5つの条件付き検索機能全てに取引先による絞り込みを追加済
-        //以下5つの条件付き検索機能全てにいいねのステータスによる絞り込みを追加済
-
-        //絞り込み検索のパラメータが存在しないか空文字の場合は全レポートを取得
-        if(filter == null ||filter.equals("")){
-            reports = em.createQuery(query +  clientFilterStr + likeFilterStr + " ORDER BY r.id DESC", Report.class)
-                    .setFirstResult(15 * (page - 1))
-                    .setMaxResults(15)
-                    .getResultList();
-
-            reports_count = (long)em.createQuery(queryCount +  clientFilterStr + likeFilterStr, Long.class)
-                       .getSingleResult();
-
-        //絞り込み検索のパラメータが課長承認待ちの場合該当レポートを取得
-        }else if(filter.equals("sectionManager")){
-            reports = em.createQuery(query + clientFilterStr + likeFilterStr + " AND r.section_manager_approval = null ORDER BY r.id DESC", Report.class)
-                    .setFirstResult(15 * (page - 1))
-                    .setMaxResults(15)
-                    .getResultList();
-
-            reports_count = (long)em.createQuery(queryCount + clientFilterStr + likeFilterStr + " AND r.section_manager_approval = null", Long.class)
-                       .getSingleResult();
-
-        //絞り込み検索のパラメータが部長承認待ちの場合該当レポートを取得
-        }else if(filter.equals("manager")){
-            reports = em.createQuery(query + clientFilterStr + likeFilterStr + " AND r.manager_approval = null AND r.section_manager_approval <> null ORDER BY r.id DESC", Report.class)
-                    .setFirstResult(15 * (page - 1))
-                    .setMaxResults(15)
-                    .getResultList();
-
-            reports_count = (long)em.createQuery(queryCount + clientFilterStr + likeFilterStr + " AND r.manager_approval = null AND r.section_manager_approval <> null", Long.class)
-                       .getSingleResult();
-
-        //絞り込み検索のパラメータが承認済みの場合該当レポートを取得
-        }else if(filter.equals("approved")){
-            reports = em.createQuery(query + clientFilterStr + likeFilterStr + " AND r.manager_approval <> null AND r.section_manager_approval <> null ORDER BY r.id DESC", Report.class)
-                    .setFirstResult(15 * (page - 1))
-                    .setMaxResults(15)
-                    .getResultList();
-
-            reports_count = (long)em.createQuery(queryCount + clientFilterStr + likeFilterStr + " AND r.manager_approval <> null AND r.section_manager_approval <> null", Long.class)
-                       .getSingleResult();
-
-        //絞り込み検索のパラメータが自分が承認した日報の場合該当レポートを取得
-        }else if(filter.equals("myApproved")){
-            reports = em.createQuery(query + clientFilterStr + likeFilterStr + " AND (r.manager_approval.id =" + login_employee.getId() + " OR r.section_manager_approval.id =" + login_employee.getId() + ") ORDER BY r.id DESC", Report.class)
-                    .setFirstResult(15 * (page - 1))
-                    .setMaxResults(15)
-                    .getResultList();
-
-            reports_count = (long)em.createQuery(queryCount + clientFilterStr + likeFilterStr + " AND (r.manager_approval.id =" + login_employee.getId() + " OR r.section_manager_approval.id =" + login_employee.getId() + ")", Long.class)
-                       .getSingleResult();
-        }
+        Long reports_count = (long)em.createQuery(queryCount + filter +  clientFilter + likeFilter, Long.class)
+                   .getSingleResult();
 
         // 絞り込み検索用に全ての取引先を取得
         List<Client> clients = em.createNamedQuery("getAllClients", Client.class)
@@ -145,9 +112,9 @@ public class ReportsIndexServlet extends HttpServlet {
         request.setAttribute("reports_count", reports_count);
         request.setAttribute("clients", clients);
         request.setAttribute("page", page);
-        request.setAttribute("filter", filter);
-        request.setAttribute("clientFilter", clientFilter);
-        request.setAttribute("likeFilter", likeFilter);
+        request.setAttribute("filter", filterStr);
+        request.setAttribute("clientFilter", clientFilterStr);
+        request.setAttribute("likeFilter", likeFilterStr);
         request.setAttribute("login_employee", login_employee);
 
 

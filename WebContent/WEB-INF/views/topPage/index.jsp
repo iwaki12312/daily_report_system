@@ -8,14 +8,22 @@
                 <c:out value="${flush}"></c:out>
             </div>
         </c:if>
-        <h2 class = "top">日報管理システムへようこそ</h2>
+        <h2 class = "top">日報管理システムへようこそ</h2><br>
+        <c:if test="${rejectReportCount > 0}">
+           <span class = "approval">！差し戻しのレポートがあります　　</span>
+           <button onclick="location.href='reports/reject?id=${employee.id}'">確認する</button><br>
+        </c:if>
+        <c:if test="${editingReportCount > 0}">
+           <span class = "approval">！編集中のレポートがあります　　　</span>
+           <button onclick="location.href='reports/editing?id=${employee.id}'">確認する</button><br>
+        </c:if>
         <c:if test="${employee.position_flag == 2 && sectionManagerCount > 0}">
            <span class = "approval">！課長承認待ちのレポートがあります</span>
-           <button onclick="location.href='approval/reports?position=${employee.position_flag}'">確認する</button>
+           <button onclick="location.href='approval/reports?position=${employee.position_flag}'">確認する</button><br>
         </c:if>
         <c:if test="${employee.position_flag == 3 && managerCount > 0}">
            <span class = "approval">！部長承認待ちのレポートがあります</span>
-           <button onclick="location.href='approval/reports?position=${employee.position_flag}'">確認する</button>
+           <button onclick="location.href='approval/reports?position=${employee.position_flag}'">確認する</button><br>
         </c:if>
         <br>
         <c:choose>

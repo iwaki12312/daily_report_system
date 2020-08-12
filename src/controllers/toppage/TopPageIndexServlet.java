@@ -92,6 +92,16 @@ public class TopPageIndexServlet extends HttpServlet {
                 .getResultList();
         int managerCount = notManagerApprovalreports.size();
 
+        // 差し戻しのレポート取得
+        List<Report> rejectReport = em.createNamedQuery("getRejectReports", Report.class)
+                .setParameter("login_employee", login_employee)
+                .getResultList();
+
+        // 編集中のレポート取得
+        List<Report> editingReport = em.createNamedQuery("getEditingReports", Report.class)
+                .setParameter("login_employee", login_employee)
+                .getResultList();
+
 
         em.close();
 
@@ -103,6 +113,9 @@ public class TopPageIndexServlet extends HttpServlet {
         request.setAttribute("employee", login_employee);
         request.setAttribute("year", dateFormatYear.format(date));
         request.setAttribute("month", dateFormatMonth.format(date));
+        request.setAttribute("rejectReportCount", rejectReport.size());
+        request.setAttribute("editingReportCount", editingReport.size());
+
 
         if(request.getSession().getAttribute("flush") != null) {
             request.setAttribute("flush", request.getSession().getAttribute("flush"));

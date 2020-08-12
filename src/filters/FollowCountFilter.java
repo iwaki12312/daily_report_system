@@ -56,11 +56,11 @@ public class FollowCountFilter implements Filter {
                 if(e != null){
 
                 long followCount = (long)em.createNamedQuery("getFollowCount", Long.class)
-                        .setParameter("employee_id", e.getId())
+                        .setParameter("employee", e)
                         .getSingleResult();
 
                 long followerCount = (long)em.createNamedQuery("getFollowerCount", Long.class)
-                        .setParameter("employee_id", e.getId())
+                        .setParameter("employee", e)
                         .getSingleResult();
 
                 request.setAttribute("followCount", followCount);

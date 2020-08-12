@@ -39,18 +39,28 @@ public class FollowEmployeeServlet extends HttpServlet {
         EntityManager em = DBUtil.createEntityManager();
 
         Employee login_employee = (Employee)request.getSession().getAttribute("login_employee");
+
+        int page;
+        try{
+            page = Integer.parseInt(request.getParameter("page"));
+        } catch(Exception e) {
+            page = 1;
+        }
+
         List<Follow> followEmployeesDeta = em.createNamedQuery("getFollowEmployees", Follow.class)
-                                                        .setParameter("login_employee_id", login_employee.getId())
+                                                        .setParameter("login_employee", login_employee)
+                                                        .setFirstResult(15 * (page - 1))
+                                                        .setMaxResults(15)
                                                         .getResultList();
 
         List<Employee> followEmployees = new ArrayList<Employee>();
 
         for(Follow followEmployeesId : followEmployeesDeta){
-            followEmployees.add(em.find(Employee.class, followEmployeesId.getFollow()));
+            followEmployees.add(em.find(Employee.class, followEmployeesId.getFollow().getId()));
         }
 
         Long employees_count = (long)em.createNamedQuery("getFollowCount", Long.class)
-                                                        .setParameter("employee_id", login_employee.getId())
+                                                        .setParameter("employee", login_employee)
                                                         .getSingleResult();
 
 

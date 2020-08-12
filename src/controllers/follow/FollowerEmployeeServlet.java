@@ -39,8 +39,18 @@ public class FollowerEmployeeServlet extends HttpServlet {
         EntityManager em = DBUtil.createEntityManager();
 
         Employee login_employee = (Employee)request.getSession().getAttribute("login_employee");
+
+        int page;
+        try{
+            page = Integer.parseInt(request.getParameter("page"));
+        } catch(Exception e) {
+            page = 1;
+        }
+
         List<Follow> followerEmployeesDeta = em.createNamedQuery("getFollowerEmployees", Follow.class)
-                                                        .setParameter("login_employee_id", login_employee.getId())
+                                                        .setFirstResult(15 * (page - 1))
+                                                        .setMaxResults(15)
+                                                        .setParameter("login_employee", login_employee)
                                                         .getResultList();
 
         List<Employee> followerEmployees = new ArrayList<Employee>();
@@ -49,14 +59,14 @@ public class FollowerEmployeeServlet extends HttpServlet {
         int i = 0;
 
         for(Follow followerEmployeesId : followerEmployeesDeta){
-            followerEmployees.add(em.find(Employee.class, followerEmployeesId.getEmployee_id()));
+            followerEmployees.add(em.find(Employee.class, followerEmployeesId.getEmployee().getId()));
 
             Follow follow = null;
 
             try{
                 follow = em.createNamedQuery("getFollows", Follow.class)
-                        .setParameter("employee_id", login_employee.getId())
-                        .setParameter("follow", followerEmployeesId.getEmployee_id())
+                        .setParameter("employee", login_employee)
+                        .setParameter("follow",followerEmployeesId.getEmployee())
                         .getSingleResult();
             }catch (Exception e) {
                 e.printStackTrace();
@@ -69,12 +79,11 @@ public class FollowerEmployeeServlet extends HttpServlet {
             }
 
             i++;
-
         }
 
 
         Long employees_count = (long)em.createNamedQuery("getFollowerCount", Long.class)
-                                                        .setParameter("employee_id", login_employee.getId())
+                                                        .setParameter("employee", login_employee)
                                                         .getSingleResult();
 
 
@@ -89,8 +98,6 @@ public class FollowerEmployeeServlet extends HttpServlet {
 
         RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/views/follow/followerEmployee.jsp");
         rd.forward(request, response);
-
-
 
 
     }

@@ -39,6 +39,17 @@ public class FollowServret extends HttpServlet {
 
         Follow b = null;
 
+        int page;
+        try{
+            page = Integer.parseInt(request.getParameter("page"));
+        } catch(Exception e) {
+            page = 1;
+        }
+        String search = request.getParameter("search");
+        String followsearch = request.getParameter("followsearch");
+        String followersearch = request.getParameter("followersearch");
+
+
 
         int reportId = 0;
         if(request.getParameter("reportId") != null){
@@ -47,12 +58,12 @@ public class FollowServret extends HttpServlet {
 
         int followerId = 0;
         if(request.getParameter("followerId") != null){
-        followerId =  Integer.parseInt(request.getParameter("followerId"));
+            followerId =  Integer.parseInt(request.getParameter("followerId"));
         }
 
         int indexId = 0;
         if(request.getParameter("indexId") != null){
-        indexId =  Integer.parseInt(request.getParameter("indexId"));
+            indexId =  Integer.parseInt(request.getParameter("indexId"));
         }
 
         if(reportId > 0){
@@ -62,7 +73,7 @@ public class FollowServret extends HttpServlet {
 
             try{
                 b = em.createNamedQuery("getFollows", Follow.class)
-                .setParameter("employee_id", login_employee.getId())
+                .setParameter("employee", login_employee.getId())
                 .setParameter("follow", employee.getId())
                 .getSingleResult();
 
@@ -74,8 +85,8 @@ public class FollowServret extends HttpServlet {
 
                 Follow a = new Follow();
 
-                a.setEmployee_id(login_employee.getId());
-                a.setFollow(employee.getId());
+                a.setEmployee(login_employee);
+                a.setFollow(employee);
                 a.setCreated_at(currentTime);
                 a.setUpdated_at(currentTime);
 
@@ -95,7 +106,7 @@ public class FollowServret extends HttpServlet {
 
             try{
                 b = em.createNamedQuery("getFollows", Follow.class)
-                .setParameter("employee_id", login_employee.getId())
+                .setParameter("employee", login_employee.getId())
                 .setParameter("follow", employee.getId())
                 .getSingleResult();
 
@@ -107,8 +118,8 @@ public class FollowServret extends HttpServlet {
 
                 Follow a = new Follow();
 
-                a.setEmployee_id(login_employee.getId());
-                a.setFollow(employee.getId());
+                a.setEmployee(login_employee);
+                a.setFollow(employee);
                 a.setCreated_at(currentTime);
                 a.setUpdated_at(currentTime);
 
@@ -129,7 +140,7 @@ public class FollowServret extends HttpServlet {
 
             try{
                 b = em.createNamedQuery("getFollows", Follow.class)
-                .setParameter("employee_id", login_employee.getId())
+                .setParameter("employee", login_employee.getId())
                 .setParameter("follow", employee.getId())
                 .getSingleResult();
 
@@ -141,8 +152,8 @@ public class FollowServret extends HttpServlet {
 
                 Follow a = new Follow();
 
-                a.setEmployee_id(login_employee.getId());
-                a.setFollow(employee.getId());
+                a.setEmployee(login_employee);
+                a.setFollow(employee);
                 a.setCreated_at(currentTime);
                 a.setUpdated_at(currentTime);
 
@@ -151,10 +162,12 @@ public class FollowServret extends HttpServlet {
                 em.getTransaction().commit();
                 em.close();
 
-                response.sendRedirect(request.getContextPath() + "/follow/index");
+                response.sendRedirect(request.getContextPath() + "/follow/index?page=" + page
+                        +"&search=" + search + "&followsearch=" + followsearch + "&followersearch=" + followersearch);
             }else{
                 em.close();
-                response.sendRedirect(request.getContextPath() + "/follow/index");
+                response.sendRedirect(request.getContextPath() + "/follow/index?page=" + page
+                        +"&search=" + search + "&followsearch=" + followsearch + "&followersearch=" + followersearch);
             }
 
         }

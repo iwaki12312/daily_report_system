@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -15,27 +16,27 @@ import javax.persistence.Table;
 @NamedQueries({
 @NamedQuery(
         name = "getFollows",
-        query = "SELECT f FROM Follow AS f WHERE f.employee_id  = :employee_id AND f.follow = :follow"
+        query = "SELECT f FROM Follow AS f WHERE f.employee = :employee AND f.follow = :follow"
         ),
 @NamedQuery(
         name = "getFollowers",
-        query = "SELECT f FROM Follow AS f WHERE f.follow = :login_employee_id AND f.employee_id  = :employee_id"
+        query = "SELECT f FROM Follow AS f WHERE f.follow = :login_employee AND f.employee  = :employee"
         ),
 @NamedQuery(
         name = "getFollowCount",
-        query = "SELECT COUNT(f) FROM Follow AS f WHERE f.employee_id  = :employee_id"
+        query = "SELECT COUNT(f) FROM Follow AS f WHERE f.employee  = :employee"
         ),
 @NamedQuery(
         name = "getFollowerCount",
-        query = "SELECT COUNT(f) FROM Follow AS f WHERE f.follow  = :employee_id"
+        query = "SELECT COUNT(f) FROM Follow AS f WHERE f.follow  = :employee"
         ),
 @NamedQuery(
         name = "getFollowEmployees",
-        query = "SELECT f FROM Follow AS f WHERE f.employee_id  = :login_employee_id"
+        query = "SELECT f FROM Follow AS f WHERE f.employee  = :login_employee"
         ),
 @NamedQuery(
         name = "getFollowerEmployees",
-        query = "SELECT f FROM Follow AS f WHERE f.follow  = :login_employee_id"
+        query = "SELECT f FROM Follow AS f WHERE f.follow  = :login_employee"
         )
 
 
@@ -49,11 +50,13 @@ public class Follow{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @JoinColumn(name = "employee_id", nullable = false)
-    private int employee_id;
+    @ManyToOne
+    @JoinColumn(name = "employee", nullable = false)
+    private Employee employee;
 
-    @Column(name = "follow", nullable = false)
-    private int follow;
+    @ManyToOne
+    @JoinColumn(name = "follow", nullable = false)
+    private Employee follow;
 
     @Column(name = "created_at", nullable = false)
     private Timestamp created_at;
@@ -69,19 +72,19 @@ public class Follow{
         this.id = id;
     }
 
-    public int getEmployee_id() {
-        return employee_id;
+    public Employee getEmployee() {
+        return employee;
     }
 
-    public void setEmployee_id(int employee_id) {
-        this.employee_id = employee_id;
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 
-    public int getFollow() {
+    public Employee getFollow() {
         return follow;
     }
 
-    public void setFollow(int follow) {
+    public void setFollow(Employee follow) {
         this.follow = follow;
     }
 
